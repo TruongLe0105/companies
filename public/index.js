@@ -26,6 +26,7 @@ const paginate = (num) => {
 }
 
 const listCompanies = async (numPage) => {
+    // fetDataSearch()
     let data = await listCardCompaniesPage(numPage)
     btnPaginate.innerHTML = `<button class="btn-paginate" onclick="paginate(1)">1</button>
     <button class="btn-paginate" onclick="paginate(2)">2</button>
@@ -74,21 +75,21 @@ const fetDataSearch = async () => {
             const e = data.data.find(e =>
                 (event.target.value === e.name.toLowerCase())
             )
-            event.target.value = ""
-            Listbtn.innerHTML = ""
-            btnList.innerHTML = ""
-            company = document.createElement('div')
-            company.innerHTML = `
+            if (e) {
+                event.target.value = ""
+                Listbtn.innerHTML = ""
+                company = document.createElement('div')
+                company.innerHTML = `
                         <div class = "list">
                         <div class = "companyName">${e.name}</div>
                         <div>${e.description.slice(0, 200)}...</div>
                         <div class = "numJobs">Num of Jobs: ${e.numOfJobs}</div>
                         </div>
                         `
-            Listbtn.appendChild(company)
-            company.addEventListener('click', () => {
-                btn.innerHTML = ""
-                Listbtn.innerHTML = `<div class="box-detail">
+                Listbtn.appendChild(company)
+                company.addEventListener('click', () => {
+                    btn.innerHTML = ""
+                    Listbtn.innerHTML = `<div class="box-detail">
                 <div class = "detail">
                 <div class = "companyName">${e.name}</div>
                 <div>${e.description}</div>
@@ -96,18 +97,22 @@ const fetDataSearch = async () => {
                 <button id="del-btn">Delete</button>
                 </div>
                 </div>`
-                if (btnLogin.innerText === "Logout") {
-                    const deleteCompanies = document.getElementById("del-btn")
-                    deleteCompanies.addEventListener('click', () => {
-                        var req = new XMLHttpRequest();
-                        req.open("DELETE", `http://localhost:3000/companies/${e.id}`, false);
-                        req.setRequestHeader("access-token", "123/json; charset=UTF-8")
-                        req.send(null)
-                        Listbtn.innerHTML = ""
-                        listCompanies(1)
-                    })
-                }
-            })
+                    if (btnLogin.innerText === "Logout") {
+                        const deleteCompanies = document.getElementById("del-btn")
+                        deleteCompanies.addEventListener('click', () => {
+                            var req = new XMLHttpRequest();
+                            req.open("DELETE", `http://localhost:3000/companies/${e.id}`, false);
+                            req.setRequestHeader("access-token", "123/json; charset=UTF-8")
+                            req.send(null)
+                            Listbtn.innerHTML = ""
+                            listCompanies(1)
+                        })
+                    }
+                })
+            } else {
+                event.target.value = ""
+                return;
+            }
         })
 
 
@@ -116,8 +121,10 @@ const fetDataSearch = async () => {
     }
 }
 
+fetDataSearch()
+
+
 btnLogin.addEventListener('click', () => {
-    clearForm.innerHTML = ""
     if (btnLogin.textContent === "Login") {
         Listbtn.innerHTML = ""
         btn.innerHTML = ""
@@ -158,11 +165,9 @@ btnLogin.addEventListener('click', () => {
 
 btnList.addEventListener('click', () => {
     Listbtn.innerHTML = ""
-    fetDataSearch()
     listCompanies(1)
 })
 
-fetDataSearch()
 listCompanies(1)
 
 
